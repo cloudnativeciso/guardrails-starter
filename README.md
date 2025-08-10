@@ -70,3 +70,32 @@ File:        examples/bad_secrets.txt
 Line:        2
 Fingerprint: examples/bad_secrets.txt:github-pat:2
 ```
+
+## CI Results (What to Expect)
+
+- **Vulnerabilities & IaC Findings:**  
+  After each push or pull request, results appear under  
+  **Security → Code scanning alerts** in the GitHub UI.
+
+- **SBOM (Software Bill of Materials):**  
+  Every CI run publishes an artifact named **sbom-spdx**.  
+  Download `sbom.spdx.json` from the workflow run’s artifacts section.
+
+---
+
+## Local Parity
+
+You can run the same checks locally without waiting for CI.
+
+Requires [Docker](https://docs.docker.com/get-docker/).
+
+```sh
+# Vulnerability + IaC scan
+make scan
+
+# SBOM generation (SPDX JSON)
+make sbom
+```
+
+These command run Trivy in a container, mirroring the CI configuration.
+No local installation of Trivy is needed.
