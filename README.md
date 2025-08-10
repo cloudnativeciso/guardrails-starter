@@ -99,3 +99,13 @@ make sbom
 
 These command run Trivy in a container, mirroring the CI configuration.
 No local installation of Trivy is needed.
+
+## Roadmap
+
+- [x] Repo scaffolded
+- [x] Pre-commit (Gitleaks)
+- [x] CI: Trivy vuln + SBOM
+- [x] Makefile for local parity
+- [ ] Examples of bad IaC and insecure Dockerfiles
+- [ ] CNCISO "Secure-by-Default" Badge
+- [ ] Policy-as-code (Kyverno) in v2
