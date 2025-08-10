@@ -1,5 +1,5 @@
 # Guardrails Starter
-
+[![Security](https://github.com/cloudnativeciso/guardrails-starter/actions/workflows/security.yml/badge.svg)](https://github.com/cloudnativeciso/guardrails-starter/actions/workflows/security.yml)
 A minimal, security-first kit that drops into any repo to add developer-friendly guardrails:  
 pre-commit secret scanning, CI dependency checks, and an SPDX SBOM.
 
