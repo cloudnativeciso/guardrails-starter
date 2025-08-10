@@ -38,16 +38,15 @@ pre-commit autoupdate
 
 ### 3. Test it works
 
-note: Make sure to replace the FAKE_GITHUB_TOKEN_123456 with an actual fake token
-
 ```sh
 mkdir -p examples
-echo "FAKE_GITHUB_TOKEN_123456" > examples/bad_secret.txt
+echo "ghp_FAKE_TOKEN_1234567890ABCDEF" > examples/bad_secret.txt
 git add examples/bad_secret.txt
 git commit -m "test: add fake token (should fail)"
 ```
 
 Expected: Commit fails with a Gitleaks findings report such as:
+> note: Make sure to replace the FAKE_GITHUB_TOKEN_123456 with an actual fake token
 
 ```sh
 ❯ git commit -m "test: add fake token (should fail)"
