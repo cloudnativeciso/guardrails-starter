@@ -1,4 +1,4 @@
-# Guardrails Starter
+# Secure by Default Starter
 [![Security](https://github.com/cloudnativeciso/secure-by-default-starter/actions/workflows/security.yml/badge.svg)](https://github.com/cloudnativeciso/secure-by-default-starter/actions/workflows/security.yml)
 
 A minimal, security-first kit that drops into any repo to add developer-friendly guardrails:  
