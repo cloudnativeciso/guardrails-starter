@@ -1,5 +1,6 @@
 # Secure by Default Starter
 [![Security](https://github.com/cloudnativeciso/secure-by-default-starter/actions/workflows/security.yml/badge.svg)](https://github.com/cloudnativeciso/secure-by-default-starter/actions/workflows/security.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 A minimal, security-first kit that drops into any repo to add developer-friendly guardrails:  
 pre-commit secret scanning, CI dependency checks, and an SPDX SBOM.
@@ -10,11 +11,19 @@ pre-commit secret scanning, CI dependency checks, and an SPDX SBOM.
 - **Pre-commit secrets scanning** using [Gitleaks](https://github.com/gitleaks/gitleaks)
   - Blocks commits that contain API keys, tokens, passwords, or other sensitive strings.
   - Runs locally for instant feedback before code leaves your machine.
+- **CI vulnerability and misconfiguration scanning** using [Trivy](https://github.com/aquasecurity/trivy)
+  - Scans both dependencies and Infrastructure-as-Code files.
+  - Fails the build for HIGH/CRITICAL issues.
+  - Uploads SARIF results to GitHub's code scanning interface.
+- **SBOM generation (SPDX JSON)** via Trivy
+  - Automatically produced for every build.
+  - Downloadable as a workflow artifact.
+- **Local parity via Makefile**
+  - Run the same CI scans locally in Docker, no extra installs needed.
 
 ---
 
 ## Quickstart
-
 
 ### 1. Install Pre-commit
 We recommend [`pipx`](https://pypa.github.io/pipx/) for isolated installs:
@@ -47,31 +56,9 @@ git add examples/bad_secret.txt
 git commit -m "test: add fake token (should fail)"
 ```
 
-Expected: Commit fails with a Gitleaks findings report such as:
-> note: Make sure to replace the FAKE_GITHUB_TOKEN_123456 with an actual fake token
+**Expected:** the commit fails with a Gitleaks findings report.
 
-```sh
-❯ git commit -m "test: add fake token (should fail)"
-[WARNING] Unstaged files detected.
-...
-Detect hardcoded secrets.................................................Failed
-- hook id: gitleaks
-- exit code: 1
-
-○
-    │╲
-    │ ○
-    ○ ░
-    ░    gitleaks
-
-Finding:     REDACTED
-Secret:      REDACTED
-RuleID:      github-pat
-Entropy:     4.546439
-File:        examples/bad_secrets.txt
-Line:        2
-Fingerprint: examples/bad_secrets.txt:github-pat:2
-```
+> Tip: The token above is intentionally fake but matches real token patterns, so Gitleaks will catch it. In real life, this prevents actual secrets from ever leaving your laptop.
 
 ---
 
@@ -79,12 +66,15 @@ Fingerprint: examples/bad_secrets.txt:github-pat:2
 
 - **Vulnerabilities & IaC Findings:**  
   After each push or pull request, results appear under  
-  **Security → Code scanning alerts** in the GitHub UI.
+  [**Security → Code scanning alerts**](../../security/code-scanning) in the GitHub UI.
 
 - **SBOM (Software Bill of Materials):**  
   Every CI run publishes an artifact named **sbom-spdx**.  
-  Download `sbom.spdx.json` from the workflow run’s artifacts section.
+  You can download it directly from the workflow run:
+  1. Go to **Actions → latest run** for your push/PR  
+  2. Scroll to **Artifacts** → download **sbom-spdx** → unzip to get `sbom.spdx.json`
 
+---
 
 ## Local Parity
 
@@ -100,8 +90,19 @@ make scan
 make sbom
 ```
 
-These command run Trivy in a container, mirroring the CI configuration.
+These commands run Trivy in a container, mirroring the CI configuration.
 No local installation of Trivy is needed.
+
+---
+
+## Secure Examples
+
+Hardened patterns that should pass our guardrails:
+
+- [`examples/Dockerfile.good`](./examples/Dockerfile.good) — UID `10001`, unprivileged port (8080), pinned base image.
+- [`examples/pod-secure.yaml`](./examples/pod-secure.yaml) — drop all caps, read‑only root FS, no privilege escalation, CPU/memory limits, non‑root UID 10001.
+
+> Use these as the baseline; only add privilege with a documented exception.
 
 ---
 
@@ -113,24 +114,18 @@ These live on a permanent tag so `main` stays green, but you can always browse t
 - pod-insecure.yaml: https://github.com/cloudnativeciso/secure-by-default-starter/blob/demo-bad-examples-v1/examples/pod-insecure.yaml
 - bad_secrets.txt: https://github.com/cloudnativeciso/secure-by-default-starter/blob/demo-bad-examples-v1/examples/bad_secrets.txt
 
+> We use a permanent tag (`demo-bad-examples-v1`) so `main` stays green while the failing demo remains accessible.
 > These are expected to **fail** CI and are safe to use for testing guardrails.
 
-## Secure Examples
-
-Hardened patterns that should pass our guardrails:
-
-- [`examples/Dockerfile.good`](./examples/Dockerfile.good) — UID `10001`, unprivileged port (8080), pinned base image.
-- [`examples/pod-secure.yaml`](./examples/pod-secure.yaml) — drop all caps, read‑only root FS, no privilege escalation, CPU/memory limits, non‑root UID 10001.
-
-> Use these as the baseline; only add privilege with a documented exception.
+---
 
 ## Security Best Practices Used in This Repo
 
 Below is a list of the security best practices showcased in our **secure** examples.  
 These follow recommendations from:
-- CNCF Secure Supply Chain Whitepaper
+- CNCF secure supply chain guidance
 - NSA Kubernetes Hardening Guide
-- NIST 800-190 (Application Container Security Guide)
+- NIST SP 800-190 (Application Container Security Guide)
 
 | Practice | Where | Why it matters |
 |---|---|---|
@@ -149,17 +144,15 @@ These follow recommendations from:
 > **Why UID 10001?**  
 > It’s a stable, non-root UID commonly used in minimal/distroless images. It avoids collisions with system users (like `nobody`), plays nicely with file permissions, and keeps privilege low by default.
 
+---
 
 ## Roadmap
-
-## Examples
-- `examples/Dockerfile.good` and `examples/pod-secure.yaml` demonstrate a passing configuration.
-- For a failing demo, see the "Purposefully Failing PR – Guardrails Demo" branch/PR.
 
 - [x] Repo scaffolded
 - [x] Pre-commit (Gitleaks)
 - [x] CI: Trivy vuln + SBOM
 - [x] Makefile for local parity
-- [ ] Examples of bad IaC and insecure Dockerfiles
-- [ ] CNCISO "Secure-by-Default" Badge
+- [x] Secure examples in repo; failing demo via permanent tag
+- [ ] “How to download SBOM” screenshots (docs/screenshots)
+- [ ] OpenSSF Scorecard (workflow)
 - [ ] Policy-as-code (Kyverno) in v2
