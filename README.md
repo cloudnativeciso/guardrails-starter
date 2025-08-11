@@ -103,6 +103,10 @@ No local installation of Trivy is needed.
 
 ## Roadmap
 
+## Examples
+- `examples/Dockerfile.good` and `examples/pod-secure.yaml` demonstrate a passing configuration.
+- For a failing demo, see the "Purposefully Failing PR – Guardrails Demo" branch/PR.
+
 - [x] Repo scaffolded
 - [x] Pre-commit (Gitleaks)
 - [x] CI: Trivy vuln + SBOM
