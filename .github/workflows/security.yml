@@ -72,7 +72,7 @@ jobs:
       
       # === Final Gate ===
       - name: Fail if vulnerabilities found
-        if: steps.trivy.outcome === 'failure'
+        if: steps.trivy.outcome == 'failure'
         run: |
           echo "High/Critical findings detected by Trivy. Failing the job."
           exit 1
