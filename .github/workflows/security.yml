@@ -36,31 +36,32 @@ jobs:
       #     sudo apt-get update -y
       #     sudo apt-get install -y trivy
 
-      # === Vuln + IaC scan ===
-      - name: Trivy (vuln + config)
-        id: trivy
+      # --- Trivy Action: produce SARIF for GitHub Code Scanning (always succeed) ---
+      - name: Trivy (SARIF vuln + config)
+        id: trivy_sarif
         uses: aquasecurity/trivy-action@0.24.0
         continue-on-error: true
         with:
           scan-type: fs
           scanners: "vuln,config"
           ignore-unfixed: true
-          severity: "HIGH,CRITICAL"
-          exit-code: 1        # fail the job on HIGH/CRITICAL
+          severity: "HIGH,CRITICAL"     # filter what goes to SARIF UI
+          exit-code: "0"                # never fail here; we gate separately
           format: "sarif"
           output: "trivy.sarif"
-      
+
       - name: Upload SARIF
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: trivy.sarif
 
-      # === SBOM (SPDX JSON) === 
+      # --- Setup Trivy CLI for SBOM + gating ---
       - name: Setup Trivy CLI
         if: always()
         uses: aquasecurity/setup-trivy@v0.2.2
-        
+
+      # --- SBOM (always publish) ---
       - name: Generate SBOM (SPDX JSON)
         if: always()
         run: |
@@ -73,10 +74,17 @@ jobs:
         with:
           name: sbom-spdx
           path: sbom.spdx.json
-      
-      # === Final Gate ===
-      - name: Fail if vulnerabilities found
-        if: steps.trivy.outcome == 'failure'
+
+      # --- Explicit Gate: fail only if HIGH/CRITICAL exist ---
+      - name: Gate on HIGH/CRITICAL (Trivy CLI)
+        id: trivy_gate
+        continue-on-error: true
+        run: |
+          echo "Gating on HIGH/CRITICAL only..."
+          trivy fs --scanners vuln,config --ignore-unfixed --severity HIGH,CRITICAL --exit-code 1 .
+
+      - name: Fail if HIGH/CRITICAL found
+        if: steps.trivy_gate.outcome == 'failure'
         run: |
           echo "High/Critical findings detected by Trivy. Failing the job."
           exit 1
