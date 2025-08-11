@@ -1,0 +1,38 @@
+# This is not meant to be a real manifest. Just used for testing purposes
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secure-pod
+spec:
+  securityContext:
+    runAsNonRoot: true # Explicitly require non-root execution
+  containers:
+    - name: app
+      image: nginx:1.27.2-alpine
+      ports:
+        - containerPort: 8080
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"] # Drop ALL Capabilities (best default for now)
+        readOnlyRootFilesystem: true # Stop attackers from writing to container's FS
+        runAsUser: 10001
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 200m
+          memory: 128Mi
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 5
+        periodSeconds: 10
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 10
+        periodSeconds: 20      
