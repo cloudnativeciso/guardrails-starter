@@ -15,6 +15,7 @@ pre-commit secret scanning, CI dependency checks, and an SPDX SBOM.
 
 ## Quickstart
 
+
 ### 1. Install Pre-commit
 We recommend [`pipx`](https://pypa.github.io/pipx/) for isolated installs:
 
@@ -72,6 +73,8 @@ Line:        2
 Fingerprint: examples/bad_secrets.txt:github-pat:2
 ```
 
+---
+
 ## CI Results (What to Expect)
 
 - **Vulnerabilities & IaC Findings:**  
@@ -82,7 +85,6 @@ Fingerprint: examples/bad_secrets.txt:github-pat:2
   Every CI run publishes an artifact named **sbom-spdx**.  
   Download `sbom.spdx.json` from the workflow run’s artifacts section.
 
----
 
 ## Local Parity
 
@@ -100,6 +102,53 @@ make sbom
 
 These command run Trivy in a container, mirroring the CI configuration.
 No local installation of Trivy is needed.
+
+---
+
+## Insecure Examples (Failing Demo)
+
+These live on a permanent tag so `main` stays green, but you can always browse them:
+
+- Dockerfile.bad: https://github.com/cloudnativeciso/secure-by-default-starter/blob/demo-bad-examples-v1/examples/Dockerfile.bad
+- pod-insecure.yaml: https://github.com/cloudnativeciso/secure-by-default-starter/blob/demo-bad-examples-v1/examples/pod-insecure.yaml
+- bad_secrets.txt: https://github.com/cloudnativeciso/secure-by-default-starter/blob/demo-bad-examples-v1/examples/bad_secrets.txt
+
+> These are expected to **fail** CI and are safe to use for testing guardrails.
+
+## Secure Examples
+
+Hardened patterns that should pass our guardrails:
+
+- [`examples/Dockerfile.good`](./examples/Dockerfile.good) — UID `10001`, unprivileged port (8080), pinned base image.
+- [`examples/pod-secure.yaml`](./examples/pod-secure.yaml) — drop all caps, read‑only root FS, no privilege escalation, CPU/memory limits, non‑root UID 10001.
+
+> Use these as the baseline; only add privilege with a documented exception.
+
+## Security Best Practices Used in This Repo
+
+Below is a list of the security best practices showcased in our **secure** examples.  
+These follow recommendations from:
+- CNCF Secure Supply Chain Whitepaper
+- NSA Kubernetes Hardening Guide
+- NIST 800-190 (Application Container Security Guide)
+
+| Practice | Where | Why it matters |
+|---|---|---|
+| **Run as non-root (UID 10001)** | Dockerfile + Pod | Avoids kernel-level privileges and common UID collisions; aligns with minimal/distroless images. |
+| **Unprivileged port (8080)** | Dockerfile + Pod | Removes need for `NET_BIND_SERVICE`; smaller attack surface. |
+| **Drop ALL capabilities** | Pod `securityContext` | Shrinks privilege footprint; nothing extra to abuse if compromised. |
+| **Disable privilege escalation** | Pod `securityContext` | Blocks `setuid`/`setgid`-style elevation inside the container. |
+| **Read-only root filesystem** | Pod `securityContext` | Prevents tampering/persistence on container root FS. |
+| **Resource requests/limits** | Pod `resources` | Prevents noisy-neighbor/DoS via CPU/memory exhaustion. |
+| **Pinned base image** | Dockerfile | Deterministic builds; reduces CVE drift from `:latest`. |
+| **Health/readiness checks** | Pod probes (optional) | Production readiness; safer rollouts and faster detection of bad deploys. |
+
+> **How to use this:** Start with these defaults in new services.  
+> If a workload needs more privilege (e.g., binding to port 80), add only what’s required (e.g., `NET_BIND_SERVICE`) and document the exception.
+
+> **Why UID 10001?**  
+> It’s a stable, non-root UID commonly used in minimal/distroless images. It avoids collisions with system users (like `nobody`), plays nicely with file permissions, and keeps privilege low by default.
+
 
 ## Roadmap
 

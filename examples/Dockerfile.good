@@ -1,6 +1,12 @@
-# Secure example: pinned, small, non-root
+# Secure example: pinned, small, non-root 
+# Smaller base images = smaller attack surface
 FROM nginx:1.27.2-alpine
-# Create an unprivileged user and use it
-RUN adduser -D -u 101 appuser
-USER 101:101
+# Create an unprivileged user and use it. 
+RUN adduser -D -u 10001 appuser
+USER 10001:10001
 # Default nginx starts as this user in alpine variant
+
+# Run on an unpriveleged port (>1024) so we don't need NET_BIND_SERVICE
+EXPOSE 8080
+
+# We can improve this Dockerfile quite a bit, but I want to keep it simple for now
