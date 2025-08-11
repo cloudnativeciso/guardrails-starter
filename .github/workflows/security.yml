@@ -9,7 +9,7 @@ on:
     
 permissions:
   contents: read
-  security-events: write # needed to upload SARIF
+  security-events: write    # needed to upload SARIF
 
 concurrency:
   group: security-${{ github.ref }}
@@ -22,40 +22,57 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      
+      # === Optional: Install Trivy CLI ===
+      # Github's ubuntu-latest runner currently has Trivy pre-installed
+      # Uncomment this if using a custom runner or if you need to pin a specific version
+      #
+      # - name: Install Trivy CLI (for SBOM)
+      #   run: |
+      #     sudo apt-get update -y
+      #     sudo apt-get install -y wget apt-transport-https gnupg lsb-release
+      #     wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo gpg --dearmor -o /usr/share/keyrings/trivy.gpg
+      #     echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/trivy.list
+      #     sudo apt-get update -y
+      #     sudo apt-get install -y trivy
 
-      # === Trivy Vuln + IaC scan (SARIF) ===
+      # === Vuln + IaC scan ===
       - name: Trivy (vuln + config)
+        id: trivy
         uses: aquasecurity/trivy-action@0.24.0
+        continue-on-error: true
         with:
           scan-type: fs
           scanners: "vuln,config"
           ignore-unfixed: true
           severity: "HIGH,CRITICAL"
-          exit-code: 1    # fail the job on HIGH/CRITICAL
+          exit-code: 1        # fail the job on HIGH/CRITICAL
           format: "sarif"
           output: "trivy.sarif"
       
       - name: Upload SARIF
+        if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: trivy.sarif
 
-      # === SBOM (SPDX) via Trivy ===
-      - name: Install Trivy CLI (for SBOM)
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y wget apt-transport-https gnupg lsb-release
-          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo gpg --dearmor -o /usr/share/keyrings/trivy.gpg
-          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/trivy.list
-          sudo apt-get update -y
-          sudo apt-get install -y trivy
-
+      # === SBOM (SPDX JSON) === 
       - name: Generate SBOM (SPDX JSON)
+        if: always()
         run: |
+          echo "SBOM step: using trivy fs (spdx-json)"
           trivy fs --format spdx-json --output sbom.spdx.json .
 
       - name: Upload SBOM artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: sbom-spdx
           path: sbom.spdx.json
+      
+      # === Final Gate ===
+      - name: Fail if vulnerabilities found
+        if: steps.trivy.outcome === 'failure'
+        run: |
+          echo "High/Critical findings detected by Trivy. Failing the job."
+          exit 1
