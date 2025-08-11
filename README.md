@@ -112,7 +112,6 @@ These live on a permanent tag so `main` stays green, but you can always browse t
 
 - Dockerfile.bad: https://github.com/cloudnativeciso/secure-by-default-starter/blob/demo-bad-examples-v1/examples/Dockerfile.bad
 - pod-insecure.yaml: https://github.com/cloudnativeciso/secure-by-default-starter/blob/demo-bad-examples-v1/examples/pod-insecure.yaml
-- bad_secrets.txt: https://github.com/cloudnativeciso/secure-by-default-starter/blob/demo-bad-examples-v1/examples/bad_secrets.txt
 
 > We use a permanent tag (`demo-bad-examples-v1`) so `main` stays green while the failing demo remains accessible.
 > These are expected to **fail** CI and are safe to use for testing guardrails.
