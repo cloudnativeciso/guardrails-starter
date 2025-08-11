@@ -59,7 +59,7 @@ jobs:
       # === SBOM (SPDX JSON) === 
       - name: Setup Trivy CLI
         if: always()
-        uses: aquasecurity/setup-trivy@0.2.2
+        uses: aquasecurity/setup-trivy@v0.2.2
         
       - name: Generate SBOM (SPDX JSON)
         if: always()
