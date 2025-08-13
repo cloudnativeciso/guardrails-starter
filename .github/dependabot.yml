@@ -1,0 +1,33 @@
+version: 2
+
+updates:
+  # Keep GitHub Actions up to date (e.g., trivy-action, upload-artifact, checkout)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Australia/Melbourne"
+    open-pull-requests-limit: 5
+    labels: ["dependencies", "ci"]
+    # Group minor+patch updates into one PR to reduce noise
+    groups:
+      actions-minor:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+
+  # Keep Docker base images in examples/ current (e.g., nginx:1.27.x-alpine)
+  - package-ecosystem: "docker"
+    directory: "/examples"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:15"
+      timezone: "Australia/Melbourne"
+    open-pull-requests-limit: 5
+    labels: ["dependencies", "container"]
+    groups:
+      docker-minor:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
