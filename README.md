@@ -4,10 +4,30 @@
 [![Dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](#)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/cloudnativeciso/secure-by-default-starter/badge)](https://securityscorecards.dev/viewer/?uri=github.com/cloudnativeciso/secure-by-default-starter)
 
+## Executive Summary
 
+This starter makes any repo **secure‑by‑default in under 5 minutes**:
+- **Pre‑commit guardrails** prevent secrets from ever leaving laptops.
+- **CI security scanning** (Trivy) blocks merges on **HIGH/CRITICAL** risks.
+- **SBOM (SPDX)** is produced on every run for asset inventory and vendor due diligence.
+- **OpenSSF Scorecard** reports secure engineering hygiene to stakeholders.
+- **Examples** show “good vs bad” configurations with a permanent failing demo tag (main stays green).
 
-A minimal, security-first kit that drops into any repo to add developer-friendly guardrails:  
-pre-commit secret scanning, CI dependency checks, and an SPDX SBOM.
+**Outcome:** Teams ship faster with lower risk, and execs get **proof** (scorecard, SBOM, artifacts) instead of promises.
+
+## Compliance Mapping (starter‑level)
+
+| Control Area | What this repo provides | Notes |
+|---|---|---|
+| **Secrets management (shift‑left)** | Pre‑commit **Gitleaks** blocks hardcoded secrets | Prevents leakage into Git history/PRs. |
+| **Vulnerability management** | CI **Trivy** scan; fails on **HIGH/CRITICAL** | Uploads SARIF to **Code scanning alerts**; exec summary artifact shows counts. |
+| **Software Bill of Materials** | **SPDX SBOM** artifact (`sbom.spdx.json`) every run | Downloadable from workflow artifacts; aligns with supplier due diligence. |
+| **Secure SDLC hygiene** | **OpenSSF Scorecard** workflow + badge | Checks branch protection, code review, pinned dependencies, token permissions, etc. |
+| **Documentation & disclosure** | **SECURITY.md** policy | Clear report path; acknowledges issues and remediation flow. |
+| **Dependency hygiene** | **Dependabot** for Actions + Docker | Weekly grouped updates reduce CVEs / supply‑chain risk. |
+
+> This is a **starter** baseline. For production: add image signing (Sigstore/SLSA), admission policies (Kyverno), and runtime hardening (seccomp/AppArmor/eBPF).
+
 
 ---
 
@@ -82,6 +102,9 @@ git commit -m "test: add fake token (should fail)"
   You can download it directly from the workflow run:
   1. Go to **Actions → latest run** for your push/PR  
   2. Scroll to **Artifacts** → download **sbom-spdx** → unzip to get `sbom.spdx.json`
+
+- **Executive Summary:**  
+  Each run publishes a `security-summary.md` artifact with counts of HIGH/CRITICAL issues and SBOM status.
 
 ---
 
