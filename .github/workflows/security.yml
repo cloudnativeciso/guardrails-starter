@@ -75,6 +75,54 @@ jobs:
           name: sbom-spdx
           path: sbom.spdx.json
 
+      # --- Exec-friendly summary (Markdown) ---
+      - name: Install jq (for JSON parsing)
+        if: always()
+        run: sudo apt-get update -y && sudo apt-get install -y jq
+
+      - name: Generate Trivy JSON (HIGH/CRITICAL only)
+        if: always()
+        run: |
+          trivy fs \
+            --scanners vuln,config \
+            --ignore-unfixed \
+            --severity HIGH,CRITICAL \
+            --format json \
+            --output trivy.high_critical.json \
+            .
+
+      - name: Build security-summary.md
+        if: always()
+        run: |
+          VULN_COUNT=$(jq '[.Results[]? | .Vulnerabilities[]?] | length' trivy.high_critical.json)
+          MISCONF_COUNT=$(jq '[.Results[]? | .Misconfigurations[]?] | map(select(.Severity=="HIGH" or .Severity=="CRITICAL")) | length' trivy.high_critical.json)
+          SBOM_STATUS="generated: sbom.spdx.json (artifact: sbom-spdx)"
+          STATUS_EMOJI="✅"
+          if [ "$VULN_COUNT" -gt 0 ] || [ "$MISCONF_COUNT" -gt 0 ]; then STATUS_EMOJI="❌"; fi
+
+          {
+            echo "# Security Summary"
+            echo ""
+            echo "- **Vulnerabilities (HIGH/CRITICAL):** $VULN_COUNT"
+            echo "- **Misconfigurations (HIGH/CRITICAL):** $MISCONF_COUNT"
+            echo "- **SBOM:** $SBOM_STATUS"
+            echo "- **Code scanning:** see Security → Code scanning alerts"
+            echo ""
+            echo "**Overall status:** $STATUS_EMOJI"
+          } > security-summary.md
+
+          echo "----"
+          echo "security-summary.md"
+          cat security-summary.md
+
+      - name: Upload Security Summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-summary
+          path: security-summary.md
+
+
       # --- Explicit Gate: fail only if HIGH/CRITICAL exist ---
       - name: Gate on HIGH/CRITICAL (Trivy CLI)
         id: trivy_gate

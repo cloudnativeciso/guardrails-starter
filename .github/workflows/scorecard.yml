@@ -8,15 +8,16 @@ on:
     - cron: "15 1 * * 5"
   workflow_dispatch:
 
-permissions:
-  contents: read
-  actions: read
-  security-events: write   # upload SARIF to code scanning
-  id-token: write          # required when publish_results: true
+permissions: read-all
 
 jobs:
   analysis:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      security-events: write   # upload SARIF to code scanning
+      id-token: write          # required when publish_results: true
     steps:
       - name: Checkout (no persist creds)
         uses: actions/checkout@v4
