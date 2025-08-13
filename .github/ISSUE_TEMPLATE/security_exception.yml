@@ -1,0 +1,110 @@
+name: Security Exception Request
+description: Request a temporary exception to a security rule/guardrail.
+title: "[SEC-EXCEPTION] <component>: <rule>"
+labels: ["security", "exception"]
+assignees: ["tcpninja"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to request a **temporary, time-bound** exception to a security guardrail (e.g., Trivy finding, secret scanning, policy-as-code).
+        Exceptions must have an **expiry date**, **business justification**, and **compensating controls**.
+
+  - type: input
+    id: rule
+    attributes:
+      label: Rule/Guardrail
+      description: Which rule or finding needs an exception? (e.g., CVE-2024-12345, Trivy AVD ID, Gitleaks rule, Kyverno policy)
+      placeholder: "e.g., CVE-2024-12345 (base image), AVD-KSV-0011"
+    validations:
+      required: true
+
+  - type: input
+    id: scope
+    attributes:
+      label: Scope (files/paths/component)
+      description: Limit the exception to the minimum scope (repo path, image, service, file).
+      placeholder: "examples/Dockerfile.good only"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Risk level
+      description: Assessed risk while exception is in place.
+      options:
+        - LOW
+        - MEDIUM
+        - HIGH
+        - CRITICAL
+    validations:
+      required: true
+
+  - type: input
+    id: owner
+    attributes:
+      label: Exception owner (accountable)
+      placeholder: "@tcpninja"
+    validations:
+      required: true
+
+  - type: input
+    id: expiry
+    attributes:
+      label: Expiry date (YYYY-MM-DD)
+      description: When should this exception auto-expire? Use ISO date format.
+      placeholder: "2025-09-30"
+    validations:
+      required: true
+
+  - type: textarea
+    id: justification
+    attributes:
+      label: Business justification
+      description: Why is this required now? What customer/delivery impact if we don't?
+      placeholder: "Customer X deadline; upgrade blocked by upstream; risk accepted by <role>."
+    validations:
+      required: true
+
+  - type: textarea
+    id: compensating
+    attributes:
+      label: Compensating controls
+      description: What reduces risk while the exception is active?
+      placeholder: "WAF rule; network policy; feature flag; monitoring alert."
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Implementation plan
+      description: How will the exception be enforced in code/config (e.g., .trivyignore CVE, sentinel-marked fake secret, Kyverno exception)?
+      placeholder: |
+        - Add CVE to .trivyignore with comment including issue # and expiry.
+        - Limit to path: examples/Dockerfile.good
+        - Remove on/before expiry.
+    validations:
+      required: true
+
+  - type: textarea
+    id: sunset
+    attributes:
+      label: Sunset plan
+      description: How will we remove the exception and fix the root cause?
+      placeholder: "Upgrade base image to nginx:1.27.3; remove .trivyignore entry; close this issue."
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: acknowledgements
+    attributes:
+      label: Acknowledgements
+      options:
+        - label: I confirm the exception is **temporary** and scoped to minimum necessary paths.
+          required: true
+        - label: I agree to remove the exception **on or before the expiry date**.
+          required: true
+        - label: I will implement compensating controls during the exception window.
+          required: true
