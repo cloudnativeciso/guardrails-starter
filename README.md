@@ -2,6 +2,7 @@
 [![Security](https://github.com/cloudnativeciso/secure-by-default-starter/actions/workflows/security.yml/badge.svg)](https://github.com/cloudnativeciso/secure-by-default-starter/actions/workflows/security.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](#)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/cloudnativeciso/secure-by-default-starter/badge)](https://securityscorecards.dev/viewer/?uri=github.com/cloudnativeciso/secure-by-default-starter)
 
 
 A minimal, security-first kit that drops into any repo to add developer-friendly guardrails:  
@@ -24,6 +25,8 @@ pre-commit secret scanning, CI dependency checks, and an SPDX SBOM.
   - Run the same CI scans locally in Docker, no extra installs needed.
 - **Automated dependency updates** via Dependabot
   - Weekly PRs for GitHub Actions and Docker base images, labeled `dependencies`.
+- **OpenSSF Scorecard** for Trust & Compliance signals
+  - Checks basic hygiene (CI, Code-Review, Branch Protection, etc)
 
 
 ---
