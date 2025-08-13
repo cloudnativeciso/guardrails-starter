@@ -1,8 +1,18 @@
 repos:
-- repo: https://github.com/gitleaks/gitleaks
-  # Pinned tag; we'll update later with 'pre-commit auto-update'
-  rev: v8.28.0
-  hooks:
-  - id: gitleaks
-    # Optional: speed up by skipping large dirs (edit as needed)
-    exclude: "(^dist/|^build/|^reports/)" 
+  - repo: https://github.com/gitleaks/gitleaks
+    # Pinned tag; we'll update later with 'pre-commit auto-update'
+    rev: v8.28.0
+    hooks:
+    - id: gitleaks
+      args: ["--staged", "--redact"]
+      # Optional: speed up by skipping large dirs (edit as needed)
+      exclude: "(^dist/|^build/|^reports/)"
+
+  # 2) Language-agnostic hygiene hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-merge-conflict
+      - id: detect-private-key
