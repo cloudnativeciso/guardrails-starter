@@ -1,0 +1,74 @@
+name: exception-expiry-reminder
+
+on:
+  schedule:
+    # 20:00 UTC daily (~6am AEST/7am AEDT depending on DST)
+    - cron: "0 20 * * *"
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write  # needed to comment/label issues
+      contents: read
+    steps:
+      - name: Scan security exception issues for expiry
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo  = context.repo.repo;
+
+            // Fetch open issues labeled "exception"
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner, repo, state: 'open', labels: 'exception', per_page: 100
+            });
+
+            const today = new Date();
+            today.setUTCHours(0,0,0,0);
+
+            for (const issue of issues) {
+              const body = issue.body || "";
+              // Parse the Issue Form field:
+              // "### Expiry date (YYYY-MM-DD)\n<value>"
+              const m = body.match(/###\\s*Expiry date.*\\n\\s*([0-9]{4}-[0-9]{2}-[0-9]{2})/i);
+              if (!m) continue;
+
+              const dateStr = m[1];
+              const expiry = new Date(dateStr + "T00:00:00Z");
+              const diffDays = Math.floor((expiry - today) / (1000*60*60*24));
+
+              const hasLabel = (name) => issue.labels?.some(l => (l.name || l) === name);
+              const ensureLabel = async (name, color, description) => {
+                try {
+                  await github.rest.issues.getLabel({ owner, repo, name });
+                } catch {
+                  await github.rest.issues.createLabel({ owner, repo, name, color, description });
+                }
+              };
+
+              if (diffDays < 0) {
+                // Expired
+                await ensureLabel('exception-expired', 'B60205', 'Security exception past its expiry date');
+                if (!hasLabel('exception-expired')) {
+                  await github.rest.issues.addLabels({ owner, repo, issue_number: issue.number, labels: ['exception-expired'] });
+                }
+                await github.rest.issues.createComment({
+                  owner, repo, issue_number: issue.number,
+                  body: `⚠️ **Expired**: The expiry date \`${dateStr}\` has passed.\n\nPlease remove the exception and close this issue, or update the expiry with justification.`
+                });
+              } else if (diffDays <= 7) {
+                // Expiring soon
+                await ensureLabel('exception-expiring-soon', 'FBCA04', 'Security exception expiring within 7 days');
+                if (!hasLabel('exception-expiring-soon')) {
+                  await github.rest.issues.addLabels({ owner, repo, issue_number: issue.number, labels: ['exception-expiring-soon'] });
+                }
+                await github.rest.issues.createComment({
+                  owner, repo, issue_number: issue.number,
+                  body: `⏳ **Expiring soon**: The expiry date is \`${dateStr}\` (in ${diffDays} day(s)).\n\nPlease plan the fix or extend with justification.`
+                });
+              }
+            }
