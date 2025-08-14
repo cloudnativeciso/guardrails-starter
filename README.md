@@ -4,8 +4,7 @@
 [![Dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](#)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/cloudnativeciso/secure-by-default-starter/badge)](https://securityscorecards.dev/viewer/?uri=github.com/cloudnativeciso/secure-by-default-starter)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Trust & Transparency](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/cloudnativeciso/secure-by-default-starter/main/docs/badges/trust-badge.json)](./docs/trust-page.md)
-
+[![Trust & Transparency](https://img.shields.io/badge/Trust%20%26%20Transparency-view-blue)](./docs/trust-page.md)
 
 ---
 
