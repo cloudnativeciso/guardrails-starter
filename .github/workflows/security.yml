@@ -1,14 +1,14 @@
 name: security
 
-on:
+on: 
   pull_request:
   push:
     branches:
       - main
   workflow_dispatch:
-
+    
 permissions:
-  contents: write
+  contents: read
   security-events: write    # needed to upload SARIF
 
 concurrency:
@@ -22,7 +22,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-
+      
       # === Optional: Install Trivy CLI ===
       # Github's ubuntu-latest runner currently has Trivy pre-installed
       # Uncomment this if using a custom runner or if you need to pin a specific version
@@ -121,39 +121,6 @@ jobs:
         with:
           name: security-summary
           path: security-summary.md
-
-      - name: Ensure badges directory exists
-        if: always()
-        run: mkdir -p docs/badges
-
-      - name: Publish dynamic Trust badge JSON
-        if: always()
-        run: |
-          VULN_COUNT=$(jq '[.Results[]? | .Vulnerabilities[]?] | length' trivy.high_critical.json 2>/dev/null || echo 0)
-          MISCONF_COUNT=$(jq '[.Results[]? | .Misconfigurations[]?] | map(select(.Severity=="HIGH" or .Severity=="CRITICAL")) | length' trivy.high_critical.json 2>/dev/null || echo 0)
-
-          STATUS_MSG="passing"
-          COLOR="success"
-          if [ "$VULN_COUNT" -gt 0 ] || [ "$MISCONF_COUNT" -gt 0 ]; then
-            STATUS_MSG="failing"
-            COLOR="critical"
-          fi
-
-          cat > docs/badges/trust-badge.json <<JSON
-          {
-            "schemaVersion": 1,
-            "label": "trust",
-            "message": "${STATUS_MSG}",
-            "color": "${COLOR}"
-          }
-          JSON
-
-      - name: Commit Trust badge (auto)
-        if: always() && github.event_name != 'pull_request'
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "ci: update trust badge (auto) [skip ci]"
-          file_pattern: docs/badges/trust-badge.json
 
 
       # --- Explicit Gate: fail only if HIGH/CRITICAL exist ---
