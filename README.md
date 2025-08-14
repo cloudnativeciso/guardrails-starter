@@ -4,6 +4,7 @@
 [![Dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](#)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/cloudnativeciso/secure-by-default-starter/badge)](https://securityscorecards.dev/viewer/?uri=github.com/cloudnativeciso/secure-by-default-starter)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Trust & Transparency](https://img.shields.io/badge/Trust%20%26%20Transparency-view-blue)](./docs/trust-page.md)
 
 ---
 
@@ -162,6 +163,19 @@ make sbom   # SBOM generation (SPDX JSON)
 | Read-only root filesystem  | Pod `securityContext`     | Prevents tampering/persistence.                               |
 | Resource requests/limits   | Pod `resources`           | Prevents noisy-neighbor/DoS via resource exhaustion.          |
 | Pinned base image          | Dockerfile                | Reduces CVE drift from `:latest`.                             |
+
+---
+
+## Trust & Transparency
+
+For executive stakeholders and security reviewers, we maintain a concise
+[**Security & Trust Overview**](./docs/trust-page.md) page with:
+
+- Latest CI security scan status
+- Where to download the most recent SBOM
+- Guardrails currently active in the repo
+- Policy exception workflow
+- Security contact information
 
 ---
 
