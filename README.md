@@ -150,7 +150,7 @@ make sbom   # SBOM generation (SPDX JSON)
 
 - [`Dockerfile.bad`](https://github.com/cloudnativeciso/secure-by-default-starter/blob/demo-bad-examples-v1/examples/Dockerfile.bad)
 - [`pod-insecure.yaml`](https://github.com/cloudnativeciso/secure-by-default-starter/blob/demo-bad-examples-v1/examples/pod-insecure.yaml)
-- [`main.bad.tf`](https://github.com/cloudnativeciso/secure-by-default-starter/blob/demo-bad-examples-v3/examples/terraform/main.bad.tf)
+- [`main.bad.tf`](https://github.com/cloudnativeciso/secure-by-default-starter/blob/demo-bad-examples-v2/examples/terraform/main.bad.tf)
 
 ---
 
