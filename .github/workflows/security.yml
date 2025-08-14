@@ -148,11 +148,13 @@ jobs:
           }
           JSON
 
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add docs/badges/trust-badge.json
-          git commit -m "ci: update trust badge (auto) [skip ci]" || echo "No changes to badge"
-          git push
+      - name: Commit Trust badge (auto)
+        if: always() && github.event_name != 'pull_request'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "ci: update trust badge (auto) [skip ci]"
+          file_pattern: docs/badges/trust-badge.json
+
 
       # --- Explicit Gate: fail only if HIGH/CRITICAL exist ---
       - name: Gate on HIGH/CRITICAL (Trivy CLI)
