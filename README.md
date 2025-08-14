@@ -142,13 +142,15 @@ make sbom   # SBOM generation (SPDX JSON)
 
 - [`examples/Dockerfile.good`](./examples/Dockerfile.good) — UID `10001`, unprivileged port (8080), pinned base image.
 - [`examples/pod-secure.yaml`](./examples/pod-secure.yaml) — drop all caps, read-only root FS, no privilege escalation, CPU/memory limits, non-root UID 10001.
+- [`examples/terraform/main.good.tf`](./examples/terraform/main.good.tf) - locked down SGs, no public egress by default unless configured
 
 ---
 
 ## Insecure Examples (Failing Demo)
 
-- Dockerfile.bad: https://github.com/cloudnativeciso/secure-by-default-starter/blob/demo-bad-examples-v1/examples/Dockerfile.bad
-- pod-insecure.yaml: https://github.com/cloudnativeciso/secure-by-default-starter/blob/demo-bad-examples-v1/examples/pod-insecure.yaml
+- [`Dockerfile.bad`](https://github.com/cloudnativeciso/secure-by-default-starter/blob/demo-bad-examples-v1/examples/Dockerfile.bad)
+- [`pod-insecure.yaml`](https://github.com/cloudnativeciso/secure-by-default-starter/blob/demo-bad-examples-v1/examples/pod-insecure.yaml)
+- [`main.bad.tf`](https://github.com/cloudnativeciso/secure-by-default-starter/blob/demo-bad-examples-v3/examples/terraform/main.bad.tf)
 
 ---
 
