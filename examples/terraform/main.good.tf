@@ -1,8 +1,8 @@
 #############################################
 # Secure by Default – Terraform (GOOD)
-# - Minimally permissive SG
-# - Designed for app pods behind an ALB or API GW
-# - No SSH/RDP ingress; HTTPS only from trusted CIDRs
+# - Least-privilege Security Group
+# - HTTPS only from trusted CIDRs
+# - No public egress (defaults to RFC1918 only)
 #############################################
 
 terraform {
@@ -19,13 +19,12 @@ provider "aws" {
   region = var.region
 }
 
-# Security Group: allow HTTPS only from trusted CIDRs (e.g., corporate egress or upstream ALB)
 resource "aws_security_group" "app_sg" {
   name        = "${var.app_name}-sg"
   description = "Restrictive SG for ${var.app_name} (${var.environment})"
   vpc_id      = var.vpc_id
 
-  # HTTPS from approved CIDRs only
+  # Ingress: HTTPS from approved CIDRs only
   dynamic "ingress" {
     for_each = var.allowed_https_cidrs
     content {
@@ -37,14 +36,17 @@ resource "aws_security_group" "app_sg" {
     }
   }
 
-  # Egress: allow all (common baseline). Tighten if you know explicit destinations/ports.
-  egress {
-    description = "Allow all egress"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+  # Egress: default-deny public; allow only approved private destinations (RFC1918 by default)
+  dynamic "egress" {
+    for_each = var.egress_cidrs
+    content {
+      description      = "Restricted egress"
+      from_port        = 0
+      to_port          = 0
+      protocol         = "-1"
+      cidr_blocks      = [egress.value]
+      ipv6_cidr_blocks = []
+    }
   }
 
   tags = {
@@ -53,11 +55,6 @@ resource "aws_security_group" "app_sg" {
     Owner       = var.owner
     ManagedBy   = "terraform"
     Purpose     = "app-ingress"
-  }
-
-  lifecycle {
-    # Prevent accidental deletion during refactors
-    prevent_destroy = false
   }
 }
 
