@@ -20,7 +20,7 @@ jobs:
       id-token: write          # required when publish_results: true
     steps:
       - name: Checkout (no persist creds)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           persist-credentials: false
 
