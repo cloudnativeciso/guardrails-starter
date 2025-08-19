@@ -107,7 +107,7 @@ pre-commit autoupdate
 
 ```sh
 mkdir -p examples
-echo "ghp_FAKE_TOKEN_1234567890ABCDEF" > examples/bad_secret.txt
+echo 'ghp_abcdefghijklmnopqrstuvwxyz0123456789' > examples/bad_secret.txt
 git add examples/bad_secret.txt
 git commit -m "test: add fake token (should fail)"
 ```

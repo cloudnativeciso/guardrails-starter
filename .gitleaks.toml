@@ -2,9 +2,6 @@ title = "CNCISO gitleaks policy (strict by default)"
 
 [allowlist]
 description = "Allow ONLY clearly marked test lines (sentinel) under examples/"
-paths = [
-  '''^examples/'''
-]
 regexes = [
   # Allow lines that include this sentinel (put it on the SAME line as your fake token)
   '''CNCISO_FAKE_SECRET'''
