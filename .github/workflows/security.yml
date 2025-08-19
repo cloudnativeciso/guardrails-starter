@@ -1,12 +1,12 @@
 name: security
 
-on: 
+on:
   pull_request:
   push:
     branches:
       - main
   workflow_dispatch:
-    
+
 permissions:
   contents: read
   security-events: write    # needed to upload SARIF
@@ -22,7 +22,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-      
+
       # === Optional: Install Trivy CLI ===
       # Github's ubuntu-latest runner currently has Trivy pre-installed
       # Uncomment this if using a custom runner or if you need to pin a specific version

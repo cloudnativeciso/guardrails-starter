@@ -179,6 +179,9 @@ For executive stakeholders and security reviewers, we maintain a concise
 - Policy exception workflow
 - Security contact information
 
+- **Compliance mapping:** see [docs/compliance-mapping.md](./docs/compliance-mapping.md)
+- **Architecture overview:** see [docs/architecture.md](./docs/architecture.md)
+
 ---
 
 ## Roadmap
