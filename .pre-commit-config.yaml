@@ -3,10 +3,14 @@ repos:
     # Pinned tag; we'll update later with 'pre-commit auto-update'
     rev: v8.28.0
     hooks:
-    - id: gitleaks
-      args: ["--staged", "--redact"]
-      # Optional: speed up by skipping large dirs (edit as needed)
-      exclude: "(^dist/|^build/|^reports/)"
+      - id: gitleaks
+        name: gitleaks (staged diff)
+        args: ["--staged", "--redact", "--exit-code", "1"]
+        pass_filenames: false
+        stages:
+          - pre-commit
+          - pre-commit
+          - pre-push # run on commit; pre-push optional
 
   # 2) Language-agnostic hygiene hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
