@@ -1,14 +1,14 @@
 ## What
-- 
+-
 
 ## Why
-- 
+-
 
 ## How tested
 - [ ] Local: `pre-commit` passes
 - [ ] CI: Security workflow green on this branch
 - [ ] Screenshots / logs (optional):
-  - 
+  -
 
 ## Risk & rollout
 - [ ] Backward compatible

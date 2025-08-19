@@ -17,7 +17,7 @@ Instead, email: **cnciso@proton.me** with:
 
 We aim to acknowledge reports **within 72 hours** and provide a remediation plan or timeline as soon as reasonably possible.
 
-If you prefer GitHub, you may open a **private** security advisory via:  
+If you prefer GitHub, you may open a **private** security advisory via:
 **Security → Advisories → Report a vulnerability** (in this repository).
 
 ## Disclosure Process
