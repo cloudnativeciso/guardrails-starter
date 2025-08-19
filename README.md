@@ -118,9 +118,13 @@ git commit -m "test: add fake token (should fail)"
 
 - **Vulnerabilities & IaC Findings:**
   Found under [Security → Code scanning alerts](../../security/code-scanning) in the GitHub UI.
+  All pushes are scanned in CI/CD:
+  ![GitHub Actions workflow passing with SBOM artifact](docs/screenshots/gh-actions-passing.jpg)
 
 - **SBOM (Software Bill of Materials):**
   Downloadable artifact (`sbom-spdx`) from the workflow run.
+  Each build publishes an SPDX SBOM Artifact:
+  ![SBOM artifact download in GitHub Actions](docs/screenshots/sbom-artifacts.jpg)
 
 - **Executive Summary:**
   `security-summary.md` artifact includes counts of HIGH/CRITICAL issues and SBOM status.
@@ -135,6 +139,8 @@ Run the same checks locally (requires [Docker](https://docs.docker.com/get-docke
 make scan   # Vulnerability + IaC scan
 make sbom   # SBOM generation (SPDX JSON)
 ```
+
+![Make Scan from local terminal](docs/screenshots/local-make-scan.jpg)
 
 ---
 
@@ -179,19 +185,20 @@ For executive stakeholders and security reviewers, we maintain a concise
 - Policy exception workflow
 - Security contact information
 
-- **Compliance mapping:** see [docs/compliance-mapping.md](./docs/compliance-mapping.md)
-- **Architecture overview:** see [docs/architecture.md](./docs/architecture.md)
+**Compliance mapping:** see [docs/compliance-mapping.md](./docs/compliance-mapping.md)
+**Architecture overview:** see [docs/architecture.md](./docs/architecture.md)
 
 ---
 
 ## Roadmap
 
-- [x] Repo scaffolded
-- [x] Pre-commit (Gitleaks)
-- [x] CI: Trivy vuln + SBOM
-- [x] Makefile for local parity
-- [x] Secure examples in repo; failing demo via permanent tag
-- [x] OpenSSF Scorecard (workflow)
-- [x] Compliance mapping & trust artifacts in README
-- [ ] “How to download SBOM” screenshots (docs/screenshots)
-- [ ] Policy-as-code (Kyverno) in v2
+**Completed (v1 baseline):**
+Scaffold, Gitleaks pre-commit, Trivy CI + SBOM, Makefile, Basic secure/insecure examples, OpenSSF Scorecard, compliance mapping & trust artifacts, initial screenshots.
+
+**Planned Enhancements:**
+- [ ] Automate Trust Badge updates (CI → shields.io)
+- [ ] Add IAM/Multicloud examples (secure vs insecure)
+- [ ] Expand pre-commit hooks (IaC lint, markdownlint)
+- [ ] Exec-friendly “Trust” page polish (auto-fill scan date)
+- [ ] More real-world IaC examples (Kubernetes, Terraform modules)
+- [ ] Demo video / GIF for Quickstart
