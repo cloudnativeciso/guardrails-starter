@@ -38,7 +38,7 @@ This starter makes any repo **secure-by-default in under 5 minutes**:
 
 ---
 
-## Compliance Mapping ()
+## Compliance Mapping
 
 | Control Theme         | This Repo Provides                                     | Maps to                              |
 |-----------------------|--------------------------------------------------------|---------------------------------------|
@@ -108,11 +108,13 @@ pre-commit autoupdate
 ```sh
 mkdir -p examples
 echo 'ghp_abcdefghijklmnopqrstuvwxyz0123456789' > examples/bad_secret.txt
+echo 'AIzaSyD4x5H7K9M1P3R5T7V9X1Z3B5D7F9H1J3' >> examples/bad_secret.txt
 git add examples/bad_secret.txt
 git commit -m "test: add fake token (should fail)"
 ```
 
 **Expected:** the commit fails with a Gitleaks findings report.
+> Make sure to remove bad example files using `rm examples/bad_secret.txt`
 
 ---
 
@@ -138,6 +140,7 @@ git commit -m "test: add fake token (should fail)"
 Run the same checks locally (requires [Docker](https://docs.docker.com/get-docker/)):
 
 ```sh
+make hook   # Check Pre-commit hooks
 make scan   # Vulnerability + IaC scan
 make sbom   # SBOM generation (SPDX JSON)
 ```
@@ -164,15 +167,21 @@ make sbom   # SBOM generation (SPDX JSON)
 
 ## Security Best Practices in This Repo
 
-| Practice                  | Where                      | Why it matters                                                |
-|---------------------------|----------------------------|----------------------------------------------------------------|
-| Run as non-root (UID 10001) | Dockerfile + Pod           | Avoids kernel-level privileges; aligns with minimal images.   |
-| Unprivileged port (8080)   | Dockerfile + Pod           | Removes need for `NET_BIND_SERVICE`.                          |
-| Drop ALL capabilities      | Pod `securityContext`     | Shrinks privilege footprint.                                  |
-| Disable privilege escalation| Pod `securityContext`    | Blocks `setuid`/`setgid`-style elevation.                     |
-| Read-only root filesystem  | Pod `securityContext`     | Prevents tampering/persistence.                               |
-| Resource requests/limits   | Pod `resources`           | Prevents noisy-neighbor/DoS via resource exhaustion.          |
-| Pinned base image          | Dockerfile                | Reduces CVE drift from `:latest`.                             |
+| Practice                     | Where                          | Why it matters                                                                 |
+|------------------------------|--------------------------------|--------------------------------------------------------------------------------|
+| Run as non-root (UID 10001)  | Dockerfile + Pod               | Avoids kernel-level privileges; aligns with minimal images.                     |
+| Unprivileged port (8080)     | Dockerfile + Pod               | Removes need for `NET_BIND_SERVICE`; simpler RBAC.                              |
+| Drop ALL capabilities        | Pod `securityContext`          | Shrinks kernel attack surface; principle of least privilege.                     |
+| Disable privilege escalation | Pod `securityContext`          | Blocks `setuid`/`setgid` elevation attacks.                                     |
+| Read-only root filesystem    | Pod `securityContext`          | Prevents persistence, tampering, and runtime injection.                         |
+| Resource requests/limits     | Pod `resources`                | Prevents noisy-neighbor and DoS from runaway containers.                        |
+| Pinned base image & digest   | Dockerfile                     | Prevents “CVE drift” from `:latest`; ensures reproducible builds.               |
+| Pre-commit secret scanning   | `.pre-commit-config.yaml` (Gitleaks) | Blocks hardcoded secrets **before** they leave the laptop.                     |
+| CI/CD vulnerability scans    | GitHub Actions (Trivy)         | Automatic check for CVEs and IaC misconfigs every build.                        |
+| SBOM generation (CycloneDX)  | GitHub Actions (Trivy SBOM)    | Creates auditable dependency inventory; critical for compliance & trust.        |
+| Compliance breadcrumbs       | `README.md`, `trust/` docs     | Maps controls to SOC2 / ISO 27001, gives early-stage startups proof.            |
+| Secure IaC examples          | `examples/terraform/*.good.tf` | Models least-privilege SGs, tagged resources; contrast with insecure defaults.  |
+| Secure coding examples       | `examples/*`                   | Learn “by contrast”: every secure example pairs with a failing demo.            |
 
 ---
 

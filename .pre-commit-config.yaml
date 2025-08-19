@@ -8,9 +8,9 @@ repos:
         args: ["--staged", "--redact", "--exit-code", "1"]
         pass_filenames: false
         stages:
-          - pre-commit  # run on commit; pre-push optional
-        # Optional: speed up by skipping large dirs (edit as needed)
-        exclude: "(^dist/|^build/|^reports/)"
+          - pre-commit
+          - pre-commit
+          - pre-push # run on commit; pre-push optional
 
   # 2) Language-agnostic hygiene hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
